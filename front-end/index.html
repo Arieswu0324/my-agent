@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReAct Agent UI</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --primary-color: #007bff;
+            --card-bg: #ffffff;
+            --input-bg: #fdfdfd;
+            --border-color: #ddd;
+            --pre-bg: #2d2d2d;
+            --pre-text: #f8f8f2;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-gap: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--input-bg);
+            font: inherit;
+            box-sizing: border-box; /* 确保 padding 不会撑大宽度 */
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #loading {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: none; /* 默认隐藏 */
+        }
+
+        #result-container {
+            margin-top: 20px;
+        }
+
+        pre {
+            background-color: var(--pre-bg);
+            color: var(--pre-text);
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap; /* 自动换行 */
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<main>
+    <h1>🤖 ReAct Agent UI</h1>
+
+    <section id="file-generator">
+        <h2>功能: 编辑并写入文件</h2>
+        <form id="file-form">
+            <div>
+                <label for="file-content">任务内容:</label>
+                <textarea id="file-content" placeholder="例如: Hello, this is a test."></textarea>
+            </div>
+            <div>
+                <label for="file-path">绝对文件路径:</label>
+                <input type="text" id="file-path" placeholder="例如: /tmp/my-file.txt 或 C:\temp\my-file.txt">
+            </div>
+            <button type="submit">执行写入任务</button>
+        </form>
+    </section>
+
+    <section id="generic-chat">
+        <h2>功能: 通用 ReAct 任务</h2>
+        <form id="chat-form">
+            <div>
+                <label for="chat-task">输入您的任务:</label>
+                <textarea id="chat-task" placeholder="例如: 请读取文件 /tmp/my-file.txt 的内容"></textarea>
+            </div>
+            <button type="submit">发送任务</button>
+        </form>
+    </section>
+
+    <section id="result-container">
+        <h2>Agent 响应</h2>
+        <div id="loading">正在处理中...</div>
+        <pre id="result-output">（请在此处提交任务...）</pre>
+    </section>
+</main>
+
+<script>
+    // 等待 DOM 加载完成
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // 获取所有需要的元素
+        const fileForm = document.getElementById('file-form');
+        const fileContent = document.getElementById('file-content');
+        const filePath = document.getElementById('file-path');
+
+        const chatForm = document.getElementById('chat-form');
+        const chatTask = document.getElementById('chat-task');
+
+        const loadingIndicator = document.getElementById('loading');
+        const resultOutput = document.getElementById('result-output');
+
+        // API 端点
+        const AGENT_API_URL = 'http://localhost:8080/api/react-agent/run';
+
+        // 1. 处理 "生成文件" 表单
+        fileForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // 阻止表单默认提交（页面刷新）
+
+            const content = fileContent.value;
+            const path = filePath.value;
+
+            if (!content || !path) {
+                alert('内容和路径都不能为空！');
+                return;
+            }
+
+            // **核心逻辑：将用户的两个输入构造成 Agent 能理解的 ReAct 任务提示词**
+            const reactTask = `请将以下内容写入文件 ${path}：\n\n${content}`;
+
+            // 调用 Agent
+            callAgent(reactTask);
+        });
+
+        // 2. 处理 "通用聊天" 表单
+        chatForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const task = chatTask.value;
+            if (!task) {
+                alert('任务内容不能为空！');
+                return;
+            }
+
+            // 直接将用户的输入作为任务
+            callAgent(task);
+        });
+
+        // 3. 可重用的 Agent 调用函数
+        async function callAgent(task) {
+            loadingIndicator.style.display = 'block'; // 显示加载
+            resultOutput.textContent = '正在等待 Agent 响应...';
+
+            const payload = {
+                task: task
+            };
+
+            try {
+                const response = await fetch(AGENT_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                // 检查 HTTP 响应是否成功
+                if (!response.ok) {
+                    throw new Error(`HTTP 错误! 状态: ${response.status} - ${response.statusText}`);
+                }
+
+                // Agent 返回的是纯文本
+                const data = await response.text();
+                resultOutput.textContent = data; // 显示最终答案
+
+            } catch (error) {
+                console.error('调用 Agent 时出错:', error);
+                resultOutput.textContent = `错误: ${error.message}\n\n请检查 Spring Boot 应用是否正在运行，以及 API 路径是否正确。`;
+            } finally {
+                loadingIndicator.style.display = 'none'; // 隐藏加载
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
