@@ -1,0 +1,24 @@
+spring:
+  ai:
+    model:
+      chat: google-genai # 显式启用 Google GenAI Chat
+
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY} # 您的 Gemini API Key
+
+        chat:
+          options:
+            # 指定要使用的模型，例如 gemini-2.5-flash (支持 Tool Calling)
+            model: gemini-2.5-flash
+
+            # 可选：配置其他参数，例如温度
+            temperature: 0.7
+    mcp:
+      client:
+        # 配置一个或多个 MCP Server 连接
+        connections:
+          mcp-tool-server-name: # 你的工具服务器名称
+            # 示例：通过 WebFlux (SSE) 连接
+            type: SSE
+            url: http://localhost:8081 # MCP Server 的地址
