@@ -1,0 +1,15 @@
+### 1. 测试 writeFile (写入文件)
+# @prompt 请把 “今天天气很好” 写到 文件 /tmp/temp.txt 中
+GET http://localhost:8080/api/react-agent/run?task=请把 “今天天气很好” 写到 文件 /tmp/temp.txt 中
+
+### 2. 测试 readFile (读取文件)
+# @prompt 请读取 相对路径data/temp.txt 文件的内容
+GET http://localhost:8080/api/react-agent/run?task=请读取 data/temp.txt 文件的内容
+
+### 3. 测试复杂的多步骤 ReAct 任务
+# @prompt 请先将 "ReAct Test" 写入 data/react.txt，然后读取该文件
+GET http://localhost:8080/api/react-agent/run?task=请先将 "ReAct Test" 写入 data/react.txt，然后读取该文件
+
+### 4. 测试需要 OS 上下文的任务
+# @prompt 我的操作系统是什么？
+GET http://localhost:8080/api/react-agent/run?task=我的操作系统是什么？
