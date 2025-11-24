@@ -14,9 +14,6 @@ public class FileTool implements AgentTool{
     public record FilePath(String filePath) {
     }
 
-    public record WriteRequest(String filePath, String content) {
-    }
-
     @Tool(description = "从指定文件路径读取文件内容。输入必须是文件路径。")
     public String readFile(FilePath filePathQuery) {
         String pathStr = filePathQuery.filePath();
@@ -33,6 +30,9 @@ public class FileTool implements AgentTool{
         } catch (IOException e) {
             return "ERROR: 读取文件失败，原因：" + e.getMessage();
         }
+    }
+
+    public record WriteRequest(String filePath, String content) {
     }
 
     @Tool(description = "将指定内容写入指定文件路径。如果文件不存在将创建，如果存在则覆盖其内容。")

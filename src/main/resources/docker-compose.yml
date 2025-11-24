@@ -1,0 +1,8 @@
+version: '3.9'
+services:
+  server:
+    image: docker.1ms.run/chromadb/chroma
+    volumes:
+      - ./chroma-data:/chroma/chroma
+    ports:
+      - "8000:8000"

@@ -13,3 +13,12 @@ Content-Type: application/json
 {
   "task": "这是一个非常非常长的任务上下文...（此处省略 10000 个字符）...请基于以上所有信息，总结一下。"
 }
+
+
+### 3. 测试embedding response
+GET http://localhost:8080/api/ai/embedding/embed_for_response?message="whom am I talking to"
+
+
+
+### 4. 测试embedding model
+GET http://localhost:8080/api/ai/embedding/embed?message="whom am I talking to"

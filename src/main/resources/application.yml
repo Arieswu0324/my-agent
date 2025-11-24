@@ -3,6 +3,9 @@ spring:
     model:
       chat: google-genai
 
+      embedding:
+        text: google-genai
+
     google:
       genai:
         api-key: ${GOOGLE_API_KEY}
@@ -11,3 +14,21 @@ spring:
           options:
             model: gemini-2.5-flash
             temperature: 0.7
+
+        embedding:
+          text:
+            options:
+              model: text-embedding-004
+
+
+    vectorstore:
+      chroma:
+        client:
+          host: http://localhost
+          port: 8000
+        initialize-schema: true
+        collection-name: my_knowledge_base
+        tenant-name: default_tenant
+        database-name: default_database
+  main:
+    allow-bean-definition-overriding: true

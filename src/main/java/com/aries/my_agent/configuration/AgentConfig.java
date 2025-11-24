@@ -30,7 +30,7 @@ public class AgentConfig {
 
     @Bean
     public ChatClient agentChatClient(ChatModel chatModel) throws IOException {
-        String systemPrompt = loadAndFormatSystemPrompt();
+        String systemPrompt = loadAndFormatReActSystemPrompt();
 
         return ChatClient.builder(chatModel)
                 .defaultSystem(systemPrompt)
@@ -38,17 +38,27 @@ public class AgentConfig {
                 .build();
     }
 
-    private String loadAndFormatSystemPrompt() throws IOException {
+    @Bean
+    public ChatClient ragChatClient(ChatModel chatModel) throws IOException {
+        return ChatClient.builder(chatModel).build();
+
+    }
+
+
+
+    private String loadAndFormatReActSystemPrompt() throws IOException {
         String promptTemplate = new String(
                 reactSystemPromptResource.getContentAsByteArray(),
                 StandardCharsets.UTF_8
         );
 
         String os = System.getProperty("os.name");
-        String fileList = getFileList(".");
+        String currentPath = Path.of(".").toAbsolutePath().normalize().toString();
+        String fileList = getFileList(".");//current working directory
 
         return promptTemplate
                 .replace("${operating_system}", os)
+                .replace("${current_directory_path}", currentPath)
                 .replace("${file_list}", fileList);
     }
 

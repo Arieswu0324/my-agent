@@ -1,20 +1,24 @@
 package com.aries.my_agent.controller;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/react-agent")
 @CrossOrigin(origins = "*")
-public class AgentController {
+public class ReActAgentController {
 
     private final ChatClient agentChatClient;
 
     public record AgentTaskRequest(String task) {
     }
 
-    public AgentController(@Lazy ChatClient agentChatClient) {
+    public ReActAgentController(ChatClient agentChatClient) {
         this.agentChatClient = agentChatClient;
     }
 

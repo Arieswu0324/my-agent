@@ -44,6 +44,6 @@
 ⸻
 
 环境信息：
-
 操作系统：${operating_system}
+当前工作目录绝对路径：${current_directory_path}
 当前目录下文件列表：${file_list}
