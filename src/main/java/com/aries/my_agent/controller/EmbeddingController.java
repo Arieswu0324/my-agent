@@ -71,6 +71,12 @@ public class EmbeddingController {
         return Map.of("Success", "file ingested");
     }
 
+    @PostMapping("/chunk")
+    public Map chunkFile(@RequestBody IngestFileRequest request) {
+        List<Document> chunks = documentChunkService.chunk(request.filePath());
+        return Map.of("Success", chunks);
+    }
+
     @GetMapping("/search")
     public Map search(@RequestParam(value = "query") String query) {
         if (StringUtil.isBlank(query)) {

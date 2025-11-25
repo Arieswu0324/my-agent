@@ -22,3 +22,33 @@ GET http://localhost:8080/api/ai/embedding/embed_for_response?message="whom am I
 
 ### 4. 测试embedding model
 GET http://localhost:8080/api/ai/embedding/embed?message="whom am I talking to"
+
+
+
+### 5. 测试chunking
+POST http://localhost:8080/api/ai/embedding/chunk
+Content-Type: application/json
+
+{
+  "filePath": "test.md"
+}
+
+### 6. 测试injestion
+POST localhost:8080/api/ai/embedding/ingest_file
+Content-Type: application/json
+
+{
+  "filePath": "test.md"
+}
+
+### 7. 测试向量查询
+GET localhost:8080/api/ai/embedding/search?query=如何重写hashCode方法
+
+
+### 8. 测试RAG流程
+POST http://localhost:8080/api/rag/ask
+Content-Type: application/json
+
+{
+  "question": "什么是泛型擦除"
+}
