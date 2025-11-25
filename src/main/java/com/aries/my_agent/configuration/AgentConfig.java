@@ -39,9 +39,8 @@ public class AgentConfig {
     }
 
     @Bean
-    public ChatClient ragChatClient(ChatModel chatModel) throws IOException {
+    public ChatClient ragChatClient(ChatModel chatModel){
         return ChatClient.builder(chatModel).build();
-
     }
 
 

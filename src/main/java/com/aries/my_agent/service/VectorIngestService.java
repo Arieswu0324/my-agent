@@ -25,8 +25,8 @@ public class VectorIngestService {
 
     private final ChromaApi chromaApi;
 
-    public VectorIngestService(EmbeddingModel geminiQueryEmbeddingModel, ChromaApi chromaApi) {
-        this.geminiDocumentEmbeddingModel = geminiQueryEmbeddingModel;
+    public VectorIngestService(EmbeddingModel geminiDocumentEmbeddingModel, ChromaApi chromaApi) {
+        this.geminiDocumentEmbeddingModel = geminiDocumentEmbeddingModel;
         this.chromaApi = chromaApi;
     }
 
